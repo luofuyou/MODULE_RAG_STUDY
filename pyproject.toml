@@ -1,0 +1,89 @@
+[project]
+name = "knowledge-hub"
+version = "0.1.0"
+description = "模块化 RAG + MCP 知识库系统 — 为学习而设计、为面试而打磨、为生产而预留"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+authors = [
+    { name = "KnowledgeHub Team" },
+]
+keywords = ["rag", "mcp", "knowledge-base", "llm", "retrieval-augmented-generation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "pyyaml>=6.0",
+    "openai>=1.0",
+    "chromadb>=0.5",
+    "rank-bm25>=0.2",
+    "markitdown>=0.0.1",
+    "Pillow>=10.0",
+    "sentence-transformers>=2.0",
+    "mcp>=1.0",
+    "streamlit>=1.28",
+    "structlog>=23.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=4.0",
+    "ruff>=0.3",
+    "mypy>=1.8",
+]
+eval = [
+    "ragas>=0.1",
+]
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+packages = { find = { where = ["src"] } }
+
+[tool.setuptools.package-data]
+knowledge_hub = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+markers = [
+    "unit: 单元测试",
+    "integration: 集成测试（需要本地存储）",
+    "e2e: 端到端测试（需要完整环境）",
+    "slow: 耗时较长的测试",
+    "requires_llm: 需要 LLM API key 的测试",
+]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "-m", "not requires_llm",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+warn_return_any = true
+warn_unused_ignores = true

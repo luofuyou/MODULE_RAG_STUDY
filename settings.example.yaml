@@ -1,0 +1,115 @@
+# settings.example.yaml — KnowledgeHub 配置模板
+# 复制此文件为 settings.yaml 并根据需要修改
+
+# ====== LLM 配置 ======
+llm:
+  provider: openai                    # openai | azure | ollama | deepseek
+  params:
+    model: gpt-4o-mini
+    temperature: 0.0
+    max_tokens: 4096
+    api_key: ${OPENAI_API_KEY}       # 环境变量引用
+
+# 用于 Image-to-Text 的 Vision LLM
+vision_llm:
+  provider: openai
+  params:
+    model: gpt-4o
+    api_key: ${OPENAI_API_KEY}
+
+# 用于 Query Rewrite / LLM Rerank 的 LLM
+rerank_llm:
+  provider: deepseek
+  params:
+    model: deepseek-chat
+    api_key: ${DEEPSEEK_API_KEY}
+
+# ====== Embedding 配置 ======
+embedding:
+  provider: openai                   # openai | ollama
+  params:
+    model: text-embedding-3-small
+    api_key: ${OPENAI_API_KEY}
+
+# ====== Reranker 配置 ======
+reranker:
+  coarse:
+    provider: cross_encoder          # cross_encoder | none
+    params:
+      model_name: BAAI/bge-reranker-base
+  fine:
+    provider: llm                    # llm | none
+    params:
+      model: gpt-4o-mini
+
+# ====== VectorStore 配置 ======
+vectorstore:
+  provider: chroma                   # chroma (预留: milvus, qdrant)
+  params:
+    persist_path: ./data/vector_db
+    collection_name: default
+
+# ====== Splitter 配置 ======
+splitter:
+  provider: langchain_recursive
+  params:
+    chunk_size: 1000
+    chunk_overlap: 200
+    separators:
+      - "\n## "
+      - "\n### "
+      - "\n\n"
+      - "\n"
+      - " "
+
+# ====== 检索配置 ======
+retrieval:
+  bm25:
+    enabled: true
+    top_k: 20
+  dense:
+    top_k: 20
+  fusion:
+    method: rrf                      # rrf | weighted
+    k: 60
+    top_n: 15
+  final_top_k: 5
+  query_rewrite: false
+
+# ====== 摄取配置 ======
+ingestion:
+  watch_dir: ./data/raw
+  image_processing:
+    enabled: true
+    max_images_per_doc: 50
+  enhancement:
+    enabled: true
+    rewrite: false                   # 可选 LLM 重写 chunk
+    inject_metadata: true
+    inject_image_desc: true
+
+# ====== MCP 配置 ======
+mcp:
+  server_name: knowledge-hub
+  server_version: "1.0.0"
+
+# ====== 可观测性配置 ======
+observability:
+  log_level: INFO
+  log_dir: ./logs
+  trace_enabled: true
+  dashboard_port: 8501
+
+# ====== 存储配置 ======
+storage:
+  sqlite_path: ./data/knowledge_hub.db
+  bm25_index_path: ./data/bm25_index
+
+# ====== 评估配置 ======
+evaluation:
+  framework: custom                  # custom | ragas
+  metrics:
+    - hit_rate
+    - mrr
+    - context_precision
+  eval_dataset_path: ./data/eval/eval_dataset.json
